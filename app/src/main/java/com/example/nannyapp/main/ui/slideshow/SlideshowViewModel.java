@@ -1,4 +1,4 @@
-package com.example.nannyapp.ui.slideshow;
+package com.example.nannyapp.main.ui.slideshow;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
