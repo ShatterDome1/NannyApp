@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "912066594687",
+    "project_id": "nanny-app-3c62e",
+    "storage_bucket": "nanny-app-3c62e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:912066594687:android:174166b8cb1b919a5d3c4a",
+        "android_client_info": {
+          "package_name": "com.example.nannyapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "912066594687-7om6875ab8789bj5nf2dju7urdodjhs4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5eXtJUmVWSX9Py_L3DrFNstxXFblHWxM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "912066594687-7om6875ab8789bj5nf2dju7urdodjhs4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
