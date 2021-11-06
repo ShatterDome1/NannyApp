@@ -16,4 +16,9 @@
     <string name="register">Register</string>
     <string name="confirm_password">Confirm password</string>
     <string name="forgot_add_email">Please add your email address</string>
+    <string name="nanny">Nanny</string>
+    <string name="parent">Parent</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
 </resources>
