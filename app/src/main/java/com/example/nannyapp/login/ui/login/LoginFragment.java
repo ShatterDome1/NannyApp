@@ -46,7 +46,6 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
@@ -90,7 +89,9 @@ public class LoginFragment extends Fragment {
                         if (task.isSuccessful()) {
                             FirebaseUser currentUser = firebaseAuth.getCurrentUser();
                             if (checkUserEmailVerification(currentUser)) {
-                                startActivity(new Intent(getActivity(), MainActivity.class));
+                                Intent intent = new Intent(getActivity(), MainActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
                             }
                             Log.d(TAG, "Sign in with email successful");
                         } else {
