@@ -12,14 +12,13 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.example.nannyapp.main.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
-
+        android:id="@+id/nav_parent"
+        android:name="com.example.nannyapp.main.ui.parent.ParentFragment"
+        android:label="@string/menu_parent"
+        tools:layout="@layout/fragment_parent" />
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.example.nannyapp.main.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/nav_nanny"
+        android:name="com.example.nannyapp.main.ui.nanny.NannyFragment"
+        android:label="@string/menu_nanny"
+        tools:layout="@layout/fragment_nanny" />
 </navigation>
