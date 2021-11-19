@@ -16,5 +16,10 @@
             android:id="@+id/nav_nanny"
             android:icon="@drawable/ic_menu_nanny"
             android:title="@string/menu_nanny" />
+
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/ic_menu_profile"
+            android:title="@string/profile" />
     </group>
 </menu>

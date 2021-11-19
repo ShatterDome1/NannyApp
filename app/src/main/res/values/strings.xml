@@ -22,4 +22,20 @@
     <string name="logout">Logout</string>
     <string name="menu_parent">Parent</string>
     <string name="menu_nanny">Nanny</string>
+    <string name="profile">Profile</string>
+    <string name="address">Address</string>
+    <string name="phone_number">Phone number</string>
+    <string name="number_of_children">Number of children</string>
+    <string name="description">Description</string>
+    <string name="save">Save</string>
+
+    <!-- Profile mandatory text fields -->
+    <string name="mandatory_first_name">First name <font color='#FF0000'>*</font></string>
+    <string name="mandatory_last_name">Last name <font color='#FF0000'>*</font></string>
+    <string name="mandatory_phone_number">Phone number <font color='#FF0000'>*</font></string>
+    <string name="mandatory_number_of_children">Number of children <font color='#FF0000'>*</font></string>
+    <string name="mandatory_email">Email <font color='#FF0000'>*</font></string>
+
+    <string name="description_detailed">Description (short summary of what you\'re looking for)</string>
+
 </resources>

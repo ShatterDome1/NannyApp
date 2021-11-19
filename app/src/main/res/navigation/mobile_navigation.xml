@@ -21,4 +21,9 @@
         android:name="com.example.nannyapp.main.ui.nanny.NannyFragment"
         android:label="@string/menu_nanny"
         tools:layout="@layout/fragment_nanny" />
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="com.example.nannyapp.main.ui.profile.ProfileFragment"
+        android:label="@string/profile"
+        tools:layout="@layout/fragment_profile" />
 </navigation>
