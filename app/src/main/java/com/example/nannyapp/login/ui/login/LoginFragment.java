@@ -20,6 +20,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.nannyapp.R;
+import com.example.nannyapp.databinding.FragmentLoginBinding;
+import com.example.nannyapp.databinding.FragmentProfileBinding;
 import com.example.nannyapp.login.LoginActivity;
 import com.example.nannyapp.main.MainActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,9 +35,7 @@ public class LoginFragment extends Fragment {
 
     private LoginViewModel mViewModel;
     private FirebaseAuth firebaseAuth;
-
-    private EditText loginEmail;
-    private EditText loginPassword;
+    private FragmentLoginBinding binding;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,7 +46,9 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_login, container, false);
+        binding = FragmentLoginBinding.inflate(inflater, container, false);
+
+        return binding.getRoot();
     }
 
     @Override
@@ -54,16 +56,11 @@ public class LoginFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
-        View view = getView();
-
-        loginEmail = view.findViewById(R.id.login_email);
-        loginPassword = view.findViewById(R.id.login_password);
-
-        initOnClickListeners(view);
+        initOnClickListeners();
     }
 
-    private void initOnClickListeners(View view) {
-        view.findViewById(R.id.login_create_account).setOnClickListener(new View.OnClickListener() {
+    private void initOnClickListeners() {
+        binding.loginCreateAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 NavDirections action = LoginFragmentDirections.actionLoginFragmentToRegisterFragment();
@@ -71,7 +68,7 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.login_forgot_password).setOnClickListener(new View.OnClickListener() {
+        binding.loginForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 NavDirections action = LoginFragmentDirections.actionLoginFragmentToResetFragment();
@@ -79,26 +76,30 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.login).setOnClickListener(new View.OnClickListener() {
+        binding.login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                firebaseAuth.signInWithEmailAndPassword(loginEmail.getText().toString(),
-                        loginPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-                            if (checkUserEmailVerification(currentUser)) {
-                                Intent intent = new Intent(getActivity(), MainActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
+                if (validateLoginFields()) {
+                    firebaseAuth.signInWithEmailAndPassword(
+                            binding.loginEmail.getText().toString(),
+                            binding.loginPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+                                if (checkUserEmailVerification(currentUser)) {
+                                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                }
+                                Log.d(TAG, "Sign in with email successful");
+                            } else {
+                                Toast.makeText(getContext(), "Invalid email or password", Toast.LENGTH_SHORT).show();
+                                Log.w(TAG, "Sign in with email failed");
                             }
-                            Log.d(TAG, "Sign in with email successful");
-                        } else {
-                            Log.w(TAG, "Sign in with email failed");
                         }
-                    }
-                });
+                    });
+                }
             }
         });
     }
@@ -111,6 +112,18 @@ public class LoginFragment extends Fragment {
             Toast.makeText(getContext(), "Please verify email", Toast.LENGTH_SHORT).show();
         }
         return isOk;
+    }
+
+    private boolean validateLoginFields() {
+        if (binding.loginEmail.getText().toString().isEmpty()) {
+            Toast.makeText(getContext(), "Please enter email", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (binding.loginPassword.getText().toString().isEmpty()) {
+            Toast.makeText(getContext(), "Please enter password", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 
 }

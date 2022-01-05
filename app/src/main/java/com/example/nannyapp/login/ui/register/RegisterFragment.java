@@ -21,6 +21,8 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.example.nannyapp.R;
+import com.example.nannyapp.databinding.FragmentLoginBinding;
+import com.example.nannyapp.databinding.FragmentRegisterBinding;
 import com.example.nannyapp.entity.User;
 import com.example.nannyapp.login.ui.login.LoginFragmentDirections;
 import com.example.nannyapp.utils.Role;
@@ -40,6 +42,7 @@ public class RegisterFragment extends Fragment {
     private RegisterViewModel mViewModel;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
+    private FragmentRegisterBinding binding;
 
     private EditText email;
     private EditText password;
@@ -51,7 +54,9 @@ public class RegisterFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_register, container, false);
+        binding = FragmentRegisterBinding.inflate(inflater, container, false);
+
+        return binding.getRoot();
     }
 
     @Override
@@ -59,22 +64,21 @@ public class RegisterFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
-        View view = getView();
-        email = view.findViewById(R.id.register_email);
-        password = view.findViewById(R.id.register_password);
-        confirmPassword = view.findViewById(R.id.register_confirm_password);
-        radioGroup = view.findViewById(R.id.register_radio_group);
-        firstName = view.findViewById(R.id.register_first_name);
-        lastName = view.findViewById(R.id.register_last_name);
+        email = binding.registerEmail;
+        password = binding.registerPassword;
+        confirmPassword = binding.registerConfirmPassword;
+        radioGroup = binding.registerRadioGroup;
+        firstName = binding.registerFirstName;
+        lastName = binding.registerLastName;
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
 
-        initOnClickListener(view);
+        initOnClickListener();
     }
 
-    private void initOnClickListener(View view) {
-        view.findViewById(R.id.register_create_account).setOnClickListener(new View.OnClickListener() {
+    private void initOnClickListener() {
+        binding.registerCreateAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (checkInput()) {

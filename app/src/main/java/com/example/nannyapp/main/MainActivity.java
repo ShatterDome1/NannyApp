@@ -1,17 +1,25 @@
 package com.example.nannyapp.main;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.nannyapp.R;
 import com.example.nannyapp.entity.User;
 import com.example.nannyapp.login.LoginActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -30,6 +38,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -39,6 +54,12 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
+    private FirebaseStorage firebaseStorage;
+    private StorageReference storageReference;
+
+    TextView nameText;
+    TextView emailText;
+    ImageView profileImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseStorage = FirebaseStorage.getInstance();
+        storageReference = firebaseStorage.getReference();
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -85,8 +108,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void initDrawerHeader(DrawerLayout drawer) {
         View header = binding.navView.getHeaderView(0);
-        TextView nameText = header.findViewById(R.id.nav_header_name);
-        TextView emailText = header.findViewById(R.id.nav_header_email);
+        nameText = header.findViewById(R.id.nav_header_name);
+        emailText = header.findViewById(R.id.nav_header_email);
+        profileImageView = header.findViewById(R.id.nav_header_image);
+
+        initProfilePicturePicker(profileImageView);
 
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         emailText.setText(currentUser.getEmail());
@@ -105,6 +131,68 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        StorageReference profileImageStorageReference = storageReference.child("images/" + currentUser.getUid());
+        final long ONE_MB = 1024 * 1024;
+        profileImageStorageReference
+                .getBytes(ONE_MB)
+                .addOnCompleteListener(new OnCompleteListener<byte[]>() {
+            @Override
+            public void onComplete(@NonNull Task<byte[]> task) {
+                if (task.isSuccessful()) {
+                    byte[] documentSnapshot = task.getResult();
+                    Bitmap profileImage = BitmapFactory.decodeByteArray(documentSnapshot, 0, documentSnapshot.length);
+                    profileImageView.setImageBitmap(profileImage);
+                } else {
+                    Log.d(TAG, "onComplete: Failed to get profile image", task.getException());
+                }
+            }
+        });
+    }
+
+    private void initProfilePicturePicker(ImageView profileImageView) {
+        profileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startImageCropActivity();
+            }
+        });
+    }
+
+    private void startImageCropActivity() {
+        CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setCropShape(CropImageView.CropShape.OVAL)
+                .setAspectRatio(1, 1)
+                .start(this);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+                StorageReference uploadImageRef = storageReference.child("images/" + firebaseAuth.getCurrentUser().getUid());
+                UploadTask uploadTask = uploadImageRef.putFile(resultUri);
+
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), "Image upload failed. Please try again", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Toast.makeText(getApplicationContext(), "Image upload successful", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Log.d(TAG, "onActivityResult: failed", error);
+            }
+        }
     }
 
     private void initFloatingActionButton() {

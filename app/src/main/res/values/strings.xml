@@ -35,7 +35,7 @@
     <string name="mandatory_phone_number">Phone number <font color='#FF0000'>*</font></string>
     <string name="mandatory_number_of_children">Number of children <font color='#FF0000'>*</font></string>
     <string name="mandatory_email">Email <font color='#FF0000'>*</font></string>
-
-    <string name="description_detailed">Description (short summary of what you\'re looking for)</string>
+    <string name="mandatory_address">Address <font color='#FF0000'>*</font></string>
+    <string name="mandatory_description">Description <font color='#FF0000'>*</font></string>
 
 </resources>

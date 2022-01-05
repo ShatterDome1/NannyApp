@@ -175,6 +175,13 @@ public class ProfileFragment extends Fragment {
             Toast.makeText(getContext(), "Please enter how many children you have", Toast.LENGTH_SHORT).show();
             return false;
         }
+        if (address.getText().toString().isEmpty()) {
+            Toast.makeText(getContext(), "Please enter your address", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (description.getText().toString().isEmpty()) {
+            Toast.makeText(getContext(), "Please let us know what you're looking for", Toast.LENGTH_SHORT).show();
+        }
         return true;
     }
 }
