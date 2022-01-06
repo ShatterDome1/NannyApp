@@ -1,4 +1,4 @@
-package com.example.nannyapp.main.ui.profile;
+package com.example.nannyapp.main.ui.profile.parent;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -16,7 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.nannyapp.databinding.FragmentProfileBinding;
+import com.example.nannyapp.databinding.FragmentParentProfileBinding;
 import com.example.nannyapp.entity.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,11 +28,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProfileFragment extends Fragment {
-    private static final String TAG = ProfileFragment.class.getSimpleName();
+public class ParentProfileFragment extends Fragment {
+    private static final String TAG = ParentProfileFragment.class.getSimpleName();
 
-    private ProfileViewModel mViewModel;
-    private FragmentProfileBinding binding;
+    private ParentProfileViewModel mViewModel;
+    private FragmentParentProfileBinding binding;
 
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
@@ -46,14 +46,14 @@ public class ProfileFragment extends Fragment {
     private EditText description;
     private Button save;
 
-    public static ProfileFragment newInstance() {
-        return new ProfileFragment();
+    public static ParentProfileFragment newInstance() {
+        return new ParentProfileFragment();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        binding = FragmentProfileBinding.inflate(inflater, container, false);
+        binding = FragmentParentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -65,7 +65,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(ParentProfileViewModel.class);
 
         firstName = binding.profileFirstName;
         lastName = binding.profileLastName;

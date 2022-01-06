@@ -15,14 +15,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.nannyapp.R;
 import com.example.nannyapp.databinding.FragmentLoginBinding;
-import com.example.nannyapp.databinding.FragmentProfileBinding;
-import com.example.nannyapp.login.LoginActivity;
 import com.example.nannyapp.main.MainActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

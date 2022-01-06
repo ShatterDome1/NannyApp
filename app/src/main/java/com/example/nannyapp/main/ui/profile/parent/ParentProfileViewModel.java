@@ -1,10 +1,10 @@
-package com.example.nannyapp.main.ui.profile;
+package com.example.nannyapp.main.ui.profile.parent;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class ProfileViewModel extends ViewModel {
+public class ParentProfileViewModel extends ViewModel {
     private MutableLiveData<String> firstName;
     private MutableLiveData<String> lastName;
     private MutableLiveData<String> email;
@@ -13,7 +13,7 @@ public class ProfileViewModel extends ViewModel {
     private MutableLiveData<String> address;
     private MutableLiveData<String> description;
 
-    public ProfileViewModel() {
+    public ParentProfileViewModel() {
         firstName = new MutableLiveData<>();
         lastName = new MutableLiveData<>();
         email = new MutableLiveData<>();

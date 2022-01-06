@@ -23,7 +23,7 @@
         tools:layout="@layout/fragment_nanny" />
     <fragment
         android:id="@+id/nav_profile"
-        android:name="com.example.nannyapp.main.ui.profile.ProfileFragment"
+        android:name="com.example.nannyapp.main.ui.profile.parent.ParentProfileFragment"
         android:label="@string/profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_parent_profile" />
 </navigation>
