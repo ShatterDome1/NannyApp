@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
                     profileImageView.setImageBitmap(profileImage);
                 } else {
                     Log.d(TAG, "onComplete: Failed to get profile image", task.getException());
+                    profileImageView.setImageResource(R.mipmap.ic_launcher_round);
                 }
             }
         });
@@ -186,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Toast.makeText(getApplicationContext(), "Image upload successful", Toast.LENGTH_SHORT).show();
+                        profileImageView.setImageURI(resultUri);
                     }
                 });
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
