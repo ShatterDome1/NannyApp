@@ -1,4 +1,4 @@
-package com.example.nannyapp.main.ui.parent;
+package com.example.nannyapp.main.ui.users;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.nannyapp.databinding.FragmentParentBinding;
 import com.example.nannyapp.entity.Nanny;
-import com.example.nannyapp.entity.Parent;
 import com.example.nannyapp.entity.Role;
 import com.example.nannyapp.main.adapter.CardAdapter;
 import com.example.nannyapp.main.adapter.CardModel;

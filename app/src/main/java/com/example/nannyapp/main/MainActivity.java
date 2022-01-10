@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
     private void initDrawerOptionsBasedOnRole(User currentUser) {
         NavigationView navigationView = binding.navView;
         Menu menu = navigationView.getMenu();
-        if (currentUser.getRole() == Role.PARENT) {
+        if (currentUser.getRole().equals(Role.PARENT)) {
             menu.findItem(R.id.nav_nanny_profile).setVisible(false);
             menu.findItem(R.id.nav_nanny).setVisible(false);
         } else {

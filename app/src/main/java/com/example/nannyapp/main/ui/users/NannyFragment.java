@@ -1,7 +1,5 @@
-package com.example.nannyapp.main.ui.nanny;
+package com.example.nannyapp.main.ui.users;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,12 +8,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.nannyapp.R;
 import com.example.nannyapp.databinding.FragmentNannyBinding;
 import com.example.nannyapp.entity.Parent;
 import com.example.nannyapp.main.adapter.CardAdapter;
