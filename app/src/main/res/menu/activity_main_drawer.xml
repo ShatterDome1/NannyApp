@@ -18,7 +18,12 @@
             android:title="@string/menu_nanny" />
 
         <item
-            android:id="@+id/nav_profile"
+            android:id="@+id/nav_nanny_profile"
+            android:icon="@drawable/ic_menu_profile"
+            android:title="@string/profile" />
+
+        <item
+            android:id="@+id/nav_parent_profile"
             android:icon="@drawable/ic_menu_profile"
             android:title="@string/profile" />
     </group>

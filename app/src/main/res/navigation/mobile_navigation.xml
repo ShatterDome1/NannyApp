@@ -22,8 +22,12 @@
         android:label="@string/menu_nanny"
         tools:layout="@layout/fragment_nanny" />
     <fragment
-        android:id="@+id/nav_profile"
-        android:name="com.example.nannyapp.main.ui.profile.parent.ParentProfileFragment"
+        android:id="@+id/nav_parent_profile"
+        android:name="com.example.nannyapp.main.ui.profile.ParentProfileFragment"
         android:label="@string/profile"
         tools:layout="@layout/fragment_parent_profile" />
+    <fragment
+        android:id="@+id/nav_nanny_profile"
+        android:name="com.example.nannyapp.main.ui.profile.NannyProfileFragment"
+        android:label="@string/profile" />
 </navigation>

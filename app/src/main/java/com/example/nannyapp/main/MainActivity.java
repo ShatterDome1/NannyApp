@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +16,7 @@ import android.widget.Toast;
 import com.example.nannyapp.R;
 import com.example.nannyapp.entity.User;
 import com.example.nannyapp.login.LoginActivity;
+import com.example.nannyapp.entity.Role;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -43,8 +43,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
-
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -80,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_parent, R.id.nav_nanny)
+                R.id.nav_home, R.id.nav_parent, R.id.nav_nanny, R.id.nav_nanny_profile, R.id.nav_parent_profile)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -125,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
                     if ( documentSnapshot != null) {
                         User currentUser = task.getResult().toObject(User.class);
                         nameText.setText(currentUser.getFirstName() + " " + currentUser.getLastName());
+
+                        initDrawerOptionsBasedOnRole(currentUser);
                     }
                 } else {
                     Log.d(TAG, "onComplete: Failed to get user", task.getException());
@@ -149,6 +149,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void initDrawerOptionsBasedOnRole(User currentUser) {
+        NavigationView navigationView = binding.navView;
+        Menu menu = navigationView.getMenu();
+        if (currentUser.getRole() == Role.PARENT) {
+            menu.findItem(R.id.nav_nanny_profile).setVisible(false);
+        } else {
+            menu.findItem(R.id.nav_parent_profile).setVisible(false);
+        }
     }
 
     private void initProfilePicturePicker(ImageView profileImageView) {

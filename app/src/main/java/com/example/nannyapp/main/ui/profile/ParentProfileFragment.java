@@ -1,4 +1,4 @@
-package com.example.nannyapp.main.ui.profile.parent;
+package com.example.nannyapp.main.ui.profile;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -17,7 +17,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.nannyapp.databinding.FragmentParentProfileBinding;
-import com.example.nannyapp.entity.User;
+import com.example.nannyapp.entity.Parent;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,8 +30,6 @@ import java.util.Map;
 
 public class ParentProfileFragment extends Fragment {
     private static final String TAG = ParentProfileFragment.class.getSimpleName();
-
-    private ParentProfileViewModel mViewModel;
     private FragmentParentProfileBinding binding;
 
     private FirebaseFirestore firebaseFirestore;
@@ -65,7 +63,6 @@ public class ParentProfileFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(ParentProfileViewModel.class);
 
         firstName = binding.profileFirstName;
         lastName = binding.profileLastName;
@@ -90,9 +87,9 @@ public class ParentProfileFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-                    User currentUserAdditionalInfo = new User();
+                    Parent currentUserAdditionalInfo;
                     DocumentSnapshot documentSnapshot = task.getResult();
-                    currentUserAdditionalInfo = documentSnapshot.toObject(User.class);
+                    currentUserAdditionalInfo = documentSnapshot.toObject(Parent.class);
 
                     initAdditionalFields(currentUser, currentUserAdditionalInfo);
                 }
@@ -101,27 +98,38 @@ public class ParentProfileFragment extends Fragment {
 
     }
 
-    private void initAdditionalFields(FirebaseUser currentUser, User user) {
+    private void initAdditionalFields(FirebaseUser currentUser, Parent user) {
         email.setText(currentUser.getEmail());
         email.setEnabled(false);
 
-        if (user.getFirstName() != null && !user.getFirstName().isEmpty()) {
-            firstName.setText(user.getFirstName());
+        String userFirstName = user.getFirstName();
+        if (userFirstName != null && !userFirstName.isEmpty()) {
+            this.firstName.setText(userFirstName);
         }
-        if (user.getLastName() != null && !user.getLastName().isEmpty()) {
-            lastName.setText(user.getLastName());
+
+        String userLastName = user.getLastName();
+        if (userLastName != null && !userLastName.isEmpty()) {
+            this.lastName.setText(userLastName);
         }
-        if (user.getPhoneNumber() != null && !user.getPhoneNumber().isEmpty()) {
-            phoneNumber.setText(user.getPhoneNumber());
+
+        String userPhoneNumber = user.getPhoneNumber();
+        if (userPhoneNumber != null && !userPhoneNumber.isEmpty()) {
+            this.phoneNumber.setText(userPhoneNumber);
         }
-        if (user.getNoChildren() != null && !user.getNoChildren().isEmpty()) {
-            noChildren.setText(user.getNoChildren());
+
+        String userNoChildren = user.getNoChildren();
+        if (userNoChildren != null && !userNoChildren.isEmpty()) {
+            this.noChildren.setText(userNoChildren);
         }
-        if (user.getAddress() != null && !user.getAddress().isEmpty()) {
-            address.setText(user.getAddress());
+
+        String userAddress = user.getAddress();
+        if (userAddress != null && !userAddress.isEmpty()) {
+            this.address.setText(userAddress);
         }
-        if (user.getDescription() != null && !user.getDescription().isEmpty()) {
-            description.setText(user.getDescription());
+
+        String userDescription = user.getDescription();
+        if (userDescription != null && !userDescription.isEmpty()) {
+            this.description.setText(userDescription);
         }
     }
 

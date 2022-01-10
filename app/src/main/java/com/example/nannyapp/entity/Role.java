@@ -1,4 +1,4 @@
-package com.example.nannyapp.utils;
+package com.example.nannyapp.entity;
 
 public enum Role {
     PARENT("PARENT"),

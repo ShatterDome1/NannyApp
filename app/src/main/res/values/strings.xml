@@ -37,5 +37,12 @@
     <string name="mandatory_email">Email <font color='#FF0000'>*</font></string>
     <string name="mandatory_address">Address <font color='#FF0000'>*</font></string>
     <string name="mandatory_description">Description <font color='#FF0000'>*</font></string>
+    <string name="mandatory_date_of_birth">Date of birth <font color='#FF0000'>*</font></string>
+    <string name="mandatory_skills">Skills <font color='#FF0000'>*</font></string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="date_of_birth">Date of birth</string>
+    <string name="skills">Skills</string>
 
 </resources>
