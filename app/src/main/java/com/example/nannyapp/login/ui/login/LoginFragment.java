@@ -28,7 +28,6 @@ import com.google.firebase.auth.FirebaseUser;
 public class LoginFragment extends Fragment {
     private static final String TAG = LoginFragment.class.getSimpleName();
 
-    private LoginViewModel mViewModel;
     private FirebaseAuth firebaseAuth;
     private FragmentLoginBinding binding;
 
@@ -49,8 +48,6 @@ public class LoginFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
-
         initOnClickListeners();
     }
 

@@ -55,8 +55,6 @@ public class NannyFragment extends Fragment {
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
 
-        parentRecyclerView = binding.parentCardViewer;
-
         initParentsList();
 
         cardAdapter = new CardAdapter(getContext(), parentList);
@@ -66,6 +64,7 @@ public class NannyFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
 
         // in below two lines we are setting layoutmanager and adapter to our recycler view.
+        parentRecyclerView = binding.nannyCardViewer;
         parentRecyclerView.setLayoutManager(linearLayoutManager);
         parentRecyclerView.setAdapter(cardAdapter);
 

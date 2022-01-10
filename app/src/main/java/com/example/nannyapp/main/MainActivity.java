@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_parent, R.id.nav_nanny, R.id.nav_nanny_profile, R.id.nav_parent_profile)
+                R.id.nav_home, R.id.nav_nanny, R.id.nav_parent, R.id.nav_nanny_profile, R.id.nav_parent_profile)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -156,8 +156,10 @@ public class MainActivity extends AppCompatActivity {
         Menu menu = navigationView.getMenu();
         if (currentUser.getRole() == Role.PARENT) {
             menu.findItem(R.id.nav_nanny_profile).setVisible(false);
+            menu.findItem(R.id.nav_nanny).setVisible(false);
         } else {
             menu.findItem(R.id.nav_parent_profile).setVisible(false);
+            menu.findItem(R.id.nav_parent).setVisible(false);
         }
     }
 

@@ -35,7 +35,6 @@ import java.util.regex.Pattern;
 public class RegisterFragment extends Fragment {
     private static final String TAG = RegisterFragment.class.getSimpleName();
 
-    private RegisterViewModel mViewModel;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     private FragmentRegisterBinding binding;
@@ -58,7 +57,6 @@ public class RegisterFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
         email = binding.registerEmail;
         password = binding.registerPassword;

@@ -30,8 +30,6 @@ import java.util.regex.Pattern;
 public class ResetFragment extends Fragment {
     private static final String TAG = ResetFragment.class.getSimpleName();
 
-    private ResetViewModel mViewModel;
-
     private EditText email;
     private Button resetButton;
 
@@ -46,7 +44,6 @@ public class ResetFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(ResetViewModel.class);
 
         firebaseAuth = FirebaseAuth.getInstance();
 

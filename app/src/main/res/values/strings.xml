@@ -20,8 +20,8 @@
     <string name="first_name">First name</string>
     <string name="last_name">Last name</string>
     <string name="logout">Logout</string>
-    <string name="menu_parent">Parent</string>
-    <string name="menu_nanny">Nanny</string>
+    <string name="menu_parent">Nannies</string>
+    <string name="menu_nanny">Parents</string>
     <string name="profile">Profile</string>
     <string name="address">Address</string>
     <string name="phone_number">Phone number</string>
