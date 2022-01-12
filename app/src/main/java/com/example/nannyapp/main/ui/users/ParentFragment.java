@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -27,7 +28,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
-public class ParentFragment extends Fragment {
+public class ParentFragment extends Fragment implements CardAdapter.OnItemClickListener {
     private static final String TAG = ParentFragment.class.getSimpleName();
 
     private FragmentParentBinding binding;
@@ -52,7 +53,7 @@ public class ParentFragment extends Fragment {
 
         initNannyList();
 
-        cardAdapter = new CardAdapter(getContext(), nannyList);
+        cardAdapter = new CardAdapter(getContext(), nannyList, this);
 
         // below line is for setting a layout manager for our recycler view.
         // here we are creating vertical list so we will provide orientation as vertical
@@ -118,5 +119,10 @@ public class ParentFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        Toast.makeText(getContext(), "Clicked " + position, Toast.LENGTH_SHORT).show();
     }
 }

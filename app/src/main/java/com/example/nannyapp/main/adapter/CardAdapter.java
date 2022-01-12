@@ -2,6 +2,7 @@ package com.example.nannyapp.main.adapter;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +17,17 @@ import com.example.nannyapp.R;
 import java.util.ArrayList;
 
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
+    private static final String TAG = CardAdapter.class.getSimpleName();
+
     private Context context;
     private ArrayList<CardModel> cardModelArrayList;
 
-    public CardAdapter(Context context, ArrayList<CardModel> cardModelArrayList) {
+    private OnItemClickListener listener;
+
+    public CardAdapter(Context context, ArrayList<CardModel> cardModelArrayList, OnItemClickListener listener) {
         this.context = context;
         this.cardModelArrayList = cardModelArrayList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -29,7 +35,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // to inflate the layout for each item of recycler view.
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_layout, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view, listener);
     }
 
     @Override
@@ -49,18 +55,31 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
 
     // View holder class for initializing of
     // your views such as TextView and Imageview.
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView profilePicture;
         private TextView fullName;
         private TextView location;
         private TextView rating;
+        private OnItemClickListener listener;
 
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView, OnItemClickListener listener) {
             super(itemView);
             profilePicture = itemView.findViewById(R.id.card_profile_picture);
             fullName = itemView.findViewById(R.id.card_full_name);
             location = itemView.findViewById(R.id.card_location);
             rating = itemView.findViewById(R.id.card_rating);
+            this.listener = listener;
+
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View view) {
+            this.listener.onItemClick(getAdapterPosition());
+        }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
     }
 }
