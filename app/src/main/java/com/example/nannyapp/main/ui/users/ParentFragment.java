@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavDirections;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,7 +35,7 @@ public class ParentFragment extends Fragment implements CardAdapter.OnItemClickL
     private FragmentParentBinding binding;
 
     private RecyclerView nannyRecyclerView;
-    private ArrayList<CardModel> nannyList = new ArrayList<>();
+    private ArrayList<CardModel> nannyList;
 
     private FirebaseFirestore firebaseFirestore;
     private FirebaseStorage firebaseStorage;
@@ -51,6 +52,7 @@ public class ParentFragment extends Fragment implements CardAdapter.OnItemClickL
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
 
+        nannyList = new ArrayList<>();
         initNannyList();
 
         cardAdapter = new CardAdapter(getContext(), nannyList, this);
@@ -77,11 +79,10 @@ public class ParentFragment extends Fragment implements CardAdapter.OnItemClickL
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()) {
-                                Log.d(TAG, "onComplete: " + queryDocumentSnapshot.getId());
-                                queryDocumentSnapshot.getId();
                                 Nanny nanny = queryDocumentSnapshot.toObject(Nanny.class);
 
-                                StorageReference profileImageStorageReference = storageReference.child("images/" + queryDocumentSnapshot.getId());
+                                String userId = queryDocumentSnapshot.getId();
+                                StorageReference profileImageStorageReference = storageReference.child("images/" + userId);
                                 final long ONE_MB = 1024 * 1024;
                                 profileImageStorageReference
                                         .getBytes(ONE_MB)
@@ -91,7 +92,7 @@ public class ParentFragment extends Fragment implements CardAdapter.OnItemClickL
                                                 if (task.isSuccessful()) {
                                                     byte[] profilePicture = task.getResult();
 
-                                                    nannyList.add(toCardModel(nanny, profilePicture));
+                                                    nannyList.add(toCardModel(nanny, profilePicture, userId));
                                                     cardAdapter.notifyItemInserted(nannyList.size());
                                                 } else {
                                                     Log.d(TAG, "onComplete: Failed to get profile image", task.getException());
@@ -106,12 +107,13 @@ public class ParentFragment extends Fragment implements CardAdapter.OnItemClickL
                 });
     }
 
-    private CardModel toCardModel(Nanny nanny, byte[] profilePicture) {
+    private CardModel toCardModel(Nanny nanny, byte[] profilePicture, String userId) {
         CardModel cardModel = new CardModel();
         cardModel.setFullName(nanny.getLastName() + " " + nanny.getFirstName());
         cardModel.setLocation(nanny.getAddress());
         cardModel.setRating("4.5");
         cardModel.setProfilePicture(profilePicture);
+        cardModel.setId(userId);
         return cardModel;
     }
 
@@ -123,6 +125,6 @@ public class ParentFragment extends Fragment implements CardAdapter.OnItemClickL
 
     @Override
     public void onItemClick(int position) {
-        Toast.makeText(getContext(), "Clicked " + position, Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onItemClick: opening nanny with id: " + cardAdapter.getItemAtPosition(position).getId());
     }
 }

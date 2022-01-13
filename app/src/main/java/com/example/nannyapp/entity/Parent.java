@@ -6,8 +6,8 @@ public class Parent extends User {
 
     public Parent() {}
 
-    public Parent(Role role, String firstName, String lastName, String phoneNumber, String address, String noChildren, String description) {
-        super(role, firstName, lastName, phoneNumber, address);
+    public Parent(Role role, String firstName, String lastName, String phoneNumber, String address, String email, String noChildren, String description) {
+        super(role, firstName, lastName, phoneNumber, address, email);
         this.noChildren = noChildren;
         this.description = description;
     }

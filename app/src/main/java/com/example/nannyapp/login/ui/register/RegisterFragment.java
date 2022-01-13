@@ -111,6 +111,7 @@ public class RegisterFragment extends Fragment {
         user.setRole(selectedRadioText.equals("Parent")? Role.PARENT : Role.NANNY);
         user.setFirstName(firstName.getText().toString());
         user.setLastName(lastName.getText().toString());
+        user.setEmail(email.getText().toString());
 
         firebaseFirestore.collection("Users").document(uid).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

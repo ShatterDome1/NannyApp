@@ -4,16 +4,10 @@ public class CardModel {
     private String fullName;
     private String location;
     private String rating;
+    private String id;
     private byte[] profilePicture;
 
     public CardModel() { }
-
-    public CardModel(String fullName, String location, String rating, byte[] profilePicture) {
-        this.fullName = fullName;
-        this.location = location;
-        this.rating = rating;
-        this.profilePicture = profilePicture;
-    }
 
     public String getFullName() {
         return fullName;
@@ -45,5 +39,13 @@ public class CardModel {
 
     public void setProfilePicture(byte[] profilePicture) {
         this.profilePicture = profilePicture;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

@@ -5,18 +5,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.nannyapp.databinding.FragmentNannyBinding;
 import com.example.nannyapp.entity.Parent;
+import com.example.nannyapp.entity.Role;
 import com.example.nannyapp.main.adapter.CardAdapter;
 import com.example.nannyapp.main.adapter.CardModel;
-import com.example.nannyapp.entity.Role;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -25,6 +26,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class NannyFragment extends Fragment implements CardAdapter.OnItemClickListener {
@@ -33,7 +35,7 @@ public class NannyFragment extends Fragment implements CardAdapter.OnItemClickLi
     private FragmentNannyBinding binding;
 
     private RecyclerView parentRecyclerView;
-    private ArrayList<CardModel> parentList = new ArrayList<>();
+    private ArrayList<CardModel> parentList;
 
     private FirebaseFirestore firebaseFirestore;
     private FirebaseStorage firebaseStorage;
@@ -51,6 +53,7 @@ public class NannyFragment extends Fragment implements CardAdapter.OnItemClickLi
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
 
+        parentList = new ArrayList<>();
         initParentsList();
 
         cardAdapter = new CardAdapter(getContext(), parentList, this);
@@ -83,11 +86,10 @@ public class NannyFragment extends Fragment implements CardAdapter.OnItemClickLi
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()) {
-                        Log.d(TAG, "onComplete: " + queryDocumentSnapshot.getId());
-                        queryDocumentSnapshot.getId();
                         Parent parent = queryDocumentSnapshot.toObject(Parent.class);
 
-                        StorageReference profileImageStorageReference = storageReference.child("images/" + queryDocumentSnapshot.getId());
+                        String userId = queryDocumentSnapshot.getId();
+                        StorageReference profileImageStorageReference = storageReference.child("images/" + userId);
                         final long ONE_MB = 1024 * 1024;
                         profileImageStorageReference
                                 .getBytes(ONE_MB)
@@ -97,7 +99,7 @@ public class NannyFragment extends Fragment implements CardAdapter.OnItemClickLi
                                         if (task.isSuccessful()) {
                                             byte[] profilePicture = task.getResult();
 
-                                            parentList.add(toCardModel(parent, profilePicture));
+                                            parentList.add(toCardModel(parent, profilePicture, userId));
                                             cardAdapter.notifyItemInserted(parentList.size());
                                         } else {
                                             Log.d(TAG, "onComplete: Failed to get profile image", task.getException());
@@ -112,18 +114,25 @@ public class NannyFragment extends Fragment implements CardAdapter.OnItemClickLi
         });
     }
 
-    private CardModel toCardModel(Parent parent, byte[] profilePicture) {
+    private CardModel toCardModel(Parent parent, byte[] profilePicture, String userId) {
         CardModel cardModel = new CardModel();
         cardModel.setFullName(parent.getLastName() + " " + parent.getFirstName());
         cardModel.setLocation(parent.getAddress());
         cardModel.setRating("4.5");
         cardModel.setProfilePicture(profilePicture);
+        cardModel.setId(userId);
         return cardModel;
     }
 
     @Override
     public void onItemClick(int position) {
-        Log.d(TAG, "onItemClick: clicked " + position);
-        Toast.makeText(getContext(), "Clicked" + position, Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onItemClick: opening parent with id: " + cardAdapter.getItemAtPosition(position).getId());
+
+        CardModel selectedCard = cardAdapter.getItemAtPosition(position);
+
+        // Convert profile image to String and pass it to destination to eliminate the need of retrieving
+        // the profile picture again
+        NavDirections navDirections = NannyFragmentDirections.actionNavNannyToParentDetails(selectedCard.getId());
+        Navigation.findNavController(getView()).navigate(navDirections);
     }
 }

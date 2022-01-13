@@ -53,6 +53,10 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         return cardModelArrayList.size();
     }
 
+    public CardModel getItemAtPosition(int position) {
+        return cardModelArrayList.get(position);
+    }
+
     // View holder class for initializing of
     // your views such as TextView and Imageview.
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
