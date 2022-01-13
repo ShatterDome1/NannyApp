@@ -77,13 +77,7 @@ public class ParentDetailsFragment extends Fragment {
                                     if (task.isSuccessful()) {
                                         byte[] profilePicture = task.getResult();
 
-                                        Bitmap image = BitmapFactory.decodeByteArray(profilePicture, 0, profilePicture.length);
-                                        binding.parentDetailsImage.setImageBitmap(image);
-                                        binding.parentDetailsName.setText(parent.getFirstName() + " " + parent.getLastName());
-                                        binding.parentDetailsAddress.setText(parent.getAddress());
-                                        binding.parentDetailsPhone.setText(parent.getPhoneNumber());
-                                        binding.parentDetailsEmail.setText(parent.getEmail());
-                                        binding.parentDetailsDescriptionValue.setText(parent.getDescription());
+                                        initTextViews(parent, profilePicture);
                                     } else {
                                         Log.d(TAG, "onComplete: Failed to get profile image", task.getException());
                                     }
@@ -92,5 +86,16 @@ public class ParentDetailsFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void initTextViews(Parent parent, byte[] profilePicture) {
+        Bitmap image = BitmapFactory.decodeByteArray(profilePicture, 0, profilePicture.length);
+        binding.parentDetailsImage.setImageBitmap(image);
+        binding.parentDetailsName.setText(parent.getFirstName() + " " + parent.getLastName());
+        binding.parentDetailsAddress.setText(parent.getAddress());
+        binding.parentDetailsPhone.setText(parent.getPhoneNumber());
+        binding.parentDetailsEmail.setText(parent.getEmail());
+        binding.parentDetailsDescriptionValue.setText(parent.getDescription());
+        binding.parentDetailsChildren.setText(parent.getNoChildren());
     }
 }

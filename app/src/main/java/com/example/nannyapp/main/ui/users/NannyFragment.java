@@ -130,8 +130,6 @@ public class NannyFragment extends Fragment implements CardAdapter.OnItemClickLi
 
         CardModel selectedCard = cardAdapter.getItemAtPosition(position);
 
-        // Convert profile image to String and pass it to destination to eliminate the need of retrieving
-        // the profile picture again
         NavDirections navDirections = NannyFragmentDirections.actionNavNannyToParentDetails(selectedCard.getId());
         Navigation.findNavController(getView()).navigate(navDirections);
     }

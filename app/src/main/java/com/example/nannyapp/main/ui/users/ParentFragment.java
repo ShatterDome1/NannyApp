@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -126,5 +127,10 @@ public class ParentFragment extends Fragment implements CardAdapter.OnItemClickL
     @Override
     public void onItemClick(int position) {
         Log.d(TAG, "onItemClick: opening nanny with id: " + cardAdapter.getItemAtPosition(position).getId());
+
+        CardModel selectedCard = cardAdapter.getItemAtPosition(position);
+
+        NavDirections navDirections = ParentFragmentDirections.actionNavParentToNannyDetails(selectedCard.getId());
+        Navigation.findNavController(getView()).navigate(navDirections);
     }
 }
