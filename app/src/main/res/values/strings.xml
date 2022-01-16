@@ -44,5 +44,7 @@
     <string name="skills">Skills</string>
     <string name="job_description">Job description</string>
     <string name="number_of_children">Number of children</string>
+    <string name="leave_review">Leave a review</string>
+    <string name="experience">Experience</string>
 
 </resources>

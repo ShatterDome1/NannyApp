@@ -14,9 +14,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.nannyapp.R;
+import com.example.nannyapp.entity.Review;
 import com.example.nannyapp.entity.User;
 import com.example.nannyapp.login.LoginActivity;
 import com.example.nannyapp.entity.Role;
+import com.example.nannyapp.main.ui.details.NannyDetailsFragment;
+import com.example.nannyapp.main.ui.dialog.ReviewDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -26,6 +29,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -44,7 +48,7 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ReviewDialog.ReviewDialogListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -120,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot documentSnapshot = task.getResult();
-                    if ( documentSnapshot != null) {
+                    if (documentSnapshot != null) {
                         User currentUser = task.getResult().toObject(User.class);
                         nameText.setText(currentUser.getFirstName() + " " + currentUser.getLastName());
 
@@ -137,18 +141,18 @@ public class MainActivity extends AppCompatActivity {
         profileImageStorageReference
                 .getBytes(ONE_MB)
                 .addOnCompleteListener(new OnCompleteListener<byte[]>() {
-            @Override
-            public void onComplete(@NonNull Task<byte[]> task) {
-                if (task.isSuccessful()) {
-                    byte[] documentSnapshot = task.getResult();
-                    Bitmap profileImage = BitmapFactory.decodeByteArray(documentSnapshot, 0, documentSnapshot.length);
-                    profileImageView.setImageBitmap(profileImage);
-                } else {
-                    Log.d(TAG, "onComplete: Failed to get profile image", task.getException());
-                    profileImageView.setImageResource(R.mipmap.ic_launcher_round);
-                }
-            }
-        });
+                    @Override
+                    public void onComplete(@NonNull Task<byte[]> task) {
+                        if (task.isSuccessful()) {
+                            byte[] documentSnapshot = task.getResult();
+                            Bitmap profileImage = BitmapFactory.decodeByteArray(documentSnapshot, 0, documentSnapshot.length);
+                            profileImageView.setImageBitmap(profileImage);
+                        } else {
+                            Log.d(TAG, "onComplete: Failed to get profile image", task.getException());
+                            profileImageView.setImageResource(R.mipmap.ic_launcher_round);
+                        }
+                    }
+                });
     }
 
     private void initDrawerOptionsBasedOnRole(User currentUser) {
@@ -237,5 +241,26 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+    }
+
+    @Override
+    public void onSubmitReviewClick(String userId, String reviewerId, String comment, Float rating) {
+        Log.d(TAG, "onSubmitReviewClick: Submit rating: " + userId + " " + reviewerId + " " + comment + " " + rating);
+        Review review = new Review();
+        review.setComment(comment);
+        review.setRating(rating);
+        firebaseFirestore.collection("Reviews")
+                .document(userId + " " + reviewerId)
+                .set(review)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getApplicationContext(), "Review posted", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.d(TAG, "onComplete: failed to push review", task.getException());
+                        }
+                    }
+                });
     }
 }

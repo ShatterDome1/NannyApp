@@ -1,4 +1,4 @@
-package com.example.nannyapp.main.adapter;
+package com.example.nannyapp.main.adapter.user;
 
 public class CardModel {
     private String fullName;

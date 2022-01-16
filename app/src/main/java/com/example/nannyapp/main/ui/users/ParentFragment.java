@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -18,8 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.nannyapp.databinding.FragmentParentBinding;
 import com.example.nannyapp.entity.Nanny;
 import com.example.nannyapp.entity.Role;
-import com.example.nannyapp.main.adapter.CardAdapter;
-import com.example.nannyapp.main.adapter.CardModel;
+import com.example.nannyapp.main.adapter.user.CardAdapter;
+import com.example.nannyapp.main.adapter.user.CardModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;

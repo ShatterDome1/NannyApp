@@ -16,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.nannyapp.databinding.FragmentNannyBinding;
 import com.example.nannyapp.entity.Parent;
 import com.example.nannyapp.entity.Role;
-import com.example.nannyapp.main.adapter.CardAdapter;
-import com.example.nannyapp.main.adapter.CardModel;
+import com.example.nannyapp.main.adapter.user.CardAdapter;
+import com.example.nannyapp.main.adapter.user.CardModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,7 +26,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class NannyFragment extends Fragment implements CardAdapter.OnItemClickListener {

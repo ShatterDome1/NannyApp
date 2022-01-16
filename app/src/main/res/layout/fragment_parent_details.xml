@@ -125,6 +125,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/parent_details_description_label" />
 
+        <TextView
+            android:id="@+id/parent_details_add_review"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/text_view_border"
+            android:drawablePadding="3dp"
+            android:gravity="center_vertical"
+            android:padding="6dp"
+            android:text="@string/leave_review"
+            app:drawableStartCompat="@drawable/ic_review"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/parent_details_description_value" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
