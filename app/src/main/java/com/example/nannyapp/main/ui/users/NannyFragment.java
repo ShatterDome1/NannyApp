@@ -14,13 +14,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.nannyapp.databinding.FragmentNannyBinding;
+import com.example.nannyapp.entity.Nanny;
 import com.example.nannyapp.entity.Parent;
+import com.example.nannyapp.entity.Review;
 import com.example.nannyapp.entity.Role;
 import com.example.nannyapp.main.adapter.user.CardAdapter;
 import com.example.nannyapp.main.adapter.user.CardModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -97,9 +100,7 @@ public class NannyFragment extends Fragment implements CardAdapter.OnItemClickLi
                                     public void onComplete(@NonNull Task<byte[]> task) {
                                         if (task.isSuccessful()) {
                                             byte[] profilePicture = task.getResult();
-
-                                            parentList.add(toCardModel(parent, profilePicture, userId));
-                                            cardAdapter.notifyItemInserted(parentList.size());
+                                            getReviewsAverageAndUpdateRecyclerView(parent, profilePicture, userId);
                                         } else {
                                             Log.d(TAG, "onComplete: Failed to get profile image", task.getException());
                                         }
@@ -113,11 +114,11 @@ public class NannyFragment extends Fragment implements CardAdapter.OnItemClickLi
         });
     }
 
-    private CardModel toCardModel(Parent parent, byte[] profilePicture, String userId) {
+    private CardModel toCardModel(Parent parent, byte[] profilePicture, String userId, String ratingAverage) {
         CardModel cardModel = new CardModel();
         cardModel.setFullName(parent.getLastName() + " " + parent.getFirstName());
         cardModel.setLocation(parent.getAddress());
-        cardModel.setRating("4.5");
+        cardModel.setRating(ratingAverage);
         cardModel.setProfilePicture(profilePicture);
         cardModel.setId(userId);
         return cardModel;
@@ -131,5 +132,30 @@ public class NannyFragment extends Fragment implements CardAdapter.OnItemClickLi
 
         NavDirections navDirections = NannyFragmentDirections.actionNavNannyToParentDetails(selectedCard.getId());
         Navigation.findNavController(getView()).navigate(navDirections);
+    }
+
+
+    private void getReviewsAverageAndUpdateRecyclerView(Parent parent, byte[] profilePicture, String userId) {
+        Query query = firebaseFirestore.collection("Reviews")
+                .whereEqualTo("userId", userId);
+
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    QuerySnapshot querySnapshot = task.getResult();
+                    Float sum = 0.0f;
+                    for (QueryDocumentSnapshot queryDocumentSnapshot: querySnapshot) {
+                        Review review = queryDocumentSnapshot.toObject(Review.class);
+                        sum += review.getRating();
+                    }
+                    String ratingAverageStr = String.valueOf(sum / querySnapshot.size());
+                    parentList.add(toCardModel(parent, profilePicture, userId, ratingAverageStr));
+                    cardAdapter.notifyItemInserted(parentList.size());
+                } else {
+                    Log.d(TAG, "onComplete: Failed to retrieve reviews for userId = " + userId);
+                }
+            }
+        });
     }
 }

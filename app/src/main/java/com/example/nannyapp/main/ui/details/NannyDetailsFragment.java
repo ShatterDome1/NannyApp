@@ -7,6 +7,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,12 +22,19 @@ import com.example.nannyapp.databinding.FragmentNannyDetailsBinding;
 import com.example.nannyapp.databinding.FragmentParentDetailsBinding;
 import com.example.nannyapp.entity.Nanny;
 import com.example.nannyapp.entity.Parent;
+import com.example.nannyapp.entity.Review;
+import com.example.nannyapp.entity.User;
+import com.example.nannyapp.main.adapter.review.ReviewAdapter;
+import com.example.nannyapp.main.adapter.review.ReviewModel;
 import com.example.nannyapp.main.ui.dialog.ReviewDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -45,6 +54,10 @@ public class NannyDetailsFragment extends Fragment {
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
     private FirebaseAuth firebaseAuth;
+
+    private ArrayList<ReviewModel> reviewList;
+    private ReviewAdapter reviewAdapter;
+    private RecyclerView reviewRecyclerView;
 
     private Nanny nanny;
 
@@ -66,6 +79,16 @@ public class NannyDetailsFragment extends Fragment {
         initUserInformation();
 
         initLeaveReviewDialog();
+
+        reviewList = new ArrayList<>();
+        initReviewList();
+
+        reviewAdapter = new ReviewAdapter(getContext(), reviewList);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+
+        reviewRecyclerView = binding.nannyDetailsReviewsViewer;
+        reviewRecyclerView.setLayoutManager(linearLayoutManager);
+        reviewRecyclerView.setAdapter(reviewAdapter);
 
         return root;
     }
@@ -167,5 +190,72 @@ public class NannyDetailsFragment extends Fragment {
         String nannyFullName = nanny.getFirstName() + " " + nanny.getLastName();
         DialogFragment dialogFragment = new ReviewDialog(nannyFullName, parent.getFirstName(), parent.getLastName(), reviewerId, userId);
         dialogFragment.show(getChildFragmentManager(), "ReviewDialog");
+    }
+
+    public void initReviewList() {
+        Log.d(TAG, "initReviewList: collecting reviews uid = " + userId);
+        Query reviewQuery = firebaseFirestore.collection("Reviews")
+                .whereEqualTo("userId", userId);
+
+        reviewQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "onComplete: retrieved reviews = " + task.getResult().size());
+                    QuerySnapshot reviewDocuments = task.getResult();
+                    for (QueryDocumentSnapshot reviewDocument: reviewDocuments) {
+                        Review review = reviewDocument.toObject(Review.class);
+                        String reviewerId = reviewDocument.getId().split(" ")[1];
+
+                        getReviewerDetailsAndAddToRecyclerList(review, reviewerId);
+                    }
+                } else {
+                    Log.d(TAG, "onComplete: failed to retrieve reviews", task.getException());
+                }
+            }
+        });
+    }
+
+    private void getReviewerDetailsAndAddToRecyclerList(Review review, String reviewerId) {
+        firebaseFirestore.collection("Users")
+                .document(reviewerId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot userDocument = task.getResult();
+                            User user = task.getResult().toObject(User.class);
+                            ReviewModel reviewModel = toReviewModel(review, user);
+                            reviewList.add(reviewModel);
+                            reviewAdapter.notifyItemInserted(reviewList.size());
+
+                            calculateAndSetReviewAverage();
+                        } else {
+                            Log.d(TAG, "onComplete: failed to retrieve reviewer details", task.getException());
+                        }
+                    }
+                });
+    }
+
+    private ReviewModel toReviewModel(Review review, User user) {
+        ReviewModel reviewModel = new ReviewModel();
+        reviewModel.setFirstName(user.getFirstName());
+        reviewModel.setLastName(user.getLastName());
+        reviewModel.setComment(review.getComment());
+        reviewModel.setRating(review.getRating());
+
+        return reviewModel;
+    }
+
+    private void calculateAndSetReviewAverage() {
+        Float sum = 0.0f;
+        for (ReviewModel review: reviewList) {
+            sum += review.getRating();
+        }
+
+        Log.d(TAG, "calculateAndSetReviewAverage: " + sum);
+
+        binding.nannyDetailsRating.setText(String.valueOf(sum / reviewList.size()));
     }
 }

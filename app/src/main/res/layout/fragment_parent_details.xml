@@ -26,7 +26,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="TextView"
             android:textColor="@android:color/black"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -38,10 +37,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:gravity="center_vertical"
-            android:text="4.5"
-            app:drawableStartCompat="@drawable/ic_rating"
             android:drawablePadding="3dp"
+            android:gravity="center_vertical"
+            app:drawableStartCompat="@drawable/ic_rating"
             app:layout_constraintBottom_toBottomOf="@+id/parent_details_image"
             app:layout_constraintStart_toEndOf="@+id/parent_details_image" />
 
@@ -50,10 +48,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:gravity="center_vertical"
             android:drawablePadding="3dp"
+            android:gravity="center_vertical"
             app:drawableStartCompat="@drawable/ic_kids"
-            android:text="2"
             app:layout_constraintBottom_toBottomOf="@+id/parent_details_image"
             app:layout_constraintEnd_toStartOf="@+id/parent_details_image" />
 
@@ -64,7 +61,6 @@
             android:layout_marginTop="16dp"
             android:gravity="center_vertical"
             android:padding="3dp"
-            android:text="TextView"
             android:textIsSelectable="true"
             app:drawableStartCompat="@drawable/ic_phone"
             app:layout_constraintEnd_toEndOf="parent"
@@ -76,9 +72,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
             android:drawablePadding="3dp"
-            android:text="TextView"
+            android:gravity="center_vertical"
             android:textIsSelectable="true"
             app:drawableStartCompat="@drawable/ic_email"
             app:layout_constraintEnd_toEndOf="parent"
@@ -90,9 +85,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
             android:drawablePadding="3dp"
-            android:text="TextView"
+            android:gravity="center_vertical"
             android:textIsSelectable="true"
             app:drawableStartCompat="@drawable/ic_location"
             app:layout_constraintEnd_toEndOf="parent"
@@ -139,6 +133,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/parent_details_description_value" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/parent_details_reviews_viewer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/parent_details_add_review" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

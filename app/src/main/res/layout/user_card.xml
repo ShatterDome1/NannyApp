@@ -16,7 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!--ImageVIew to display our Course Image-->
         <ImageView
             android:id="@+id/card_profile_picture"
             android:layout_width="100dp"
@@ -28,7 +27,6 @@
             android:contentDescription="@string/app_name"
             android:padding="5dp" />
 
-        <!--Text View to display Course Name-->
         <TextView
             android:id="@+id/card_full_name"
             android:layout_width="match_parent"
@@ -40,8 +38,6 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <!--Text VIew to display COurse Rating-->
-        <!--Image used in present in drawable folder-->
         <TextView
             android:id="@+id/card_location"
             android:layout_width="match_parent"

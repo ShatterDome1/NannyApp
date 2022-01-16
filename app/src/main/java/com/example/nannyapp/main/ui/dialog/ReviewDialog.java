@@ -64,7 +64,7 @@ public class ReviewDialog extends DialogFragment {
 
         userNameView.setText(this.userName);
         reviewerNameView.setText(this.reviewerFirstName + " " + reviewerLastName);
-        reviewerInitialView.setText(this.reviewerFirstName.charAt(0) + String.valueOf(this.reviewerLastName.charAt(0)));
+        reviewerInitialView.setText(new StringBuilder().append(reviewerFirstName.charAt(0)).append(reviewerLastName.charAt(0)).toString());
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout

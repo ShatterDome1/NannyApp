@@ -91,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements ReviewDialog.Revi
 
         initDrawerHeader(drawer);
         initToolbarMenu();
-        initFloatingActionButton();
     }
 
     @Override
@@ -213,16 +212,6 @@ public class MainActivity extends AppCompatActivity implements ReviewDialog.Revi
         }
     }
 
-    private void initFloatingActionButton() {
-        binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-    }
-
     private void initToolbarMenu() {
         binding.appBarMain.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -249,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements ReviewDialog.Revi
         Review review = new Review();
         review.setComment(comment);
         review.setRating(rating);
+        review.setUserId(userId);
         firebaseFirestore.collection("Reviews")
                 .document(userId + " " + reviewerId)
                 .set(review)
