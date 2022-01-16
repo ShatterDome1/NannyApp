@@ -180,11 +180,15 @@ public class ParentDetailsFragment extends Fragment {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "onComplete: retrieved reviews = " + task.getResult().size());
                     QuerySnapshot reviewDocuments = task.getResult();
-                    for (QueryDocumentSnapshot reviewDocument: reviewDocuments) {
-                        Review review = reviewDocument.toObject(Review.class);
-                        String reviewerId = reviewDocument.getId().split(" ")[1];
+                    if (reviewDocuments.size() != 0) {
+                        for (QueryDocumentSnapshot reviewDocument : reviewDocuments) {
+                            Review review = reviewDocument.toObject(Review.class);
+                            String reviewerId = reviewDocument.getId().split(" ")[1];
 
-                        getReviewerDetailsAndAddToRecyclerList(review, reviewerId);
+                            getReviewerDetailsAndAddToRecyclerList(review, reviewerId);
+                        }
+                    } else {
+                        binding.parentDetailsRating.setText("N/A");
                     }
                 } else {
                     Log.d(TAG, "onComplete: failed to retrieve reviews", task.getException());
@@ -231,9 +235,6 @@ public class ParentDetailsFragment extends Fragment {
         for (ReviewModel review: reviewList) {
             sum += review.getRating();
         }
-
-        Log.d(TAG, "calculateAndSetReviewAverage: " + sum);
-
         binding.parentDetailsRating.setText(String.valueOf(sum / reviewList.size()));
     }
 }

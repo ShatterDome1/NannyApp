@@ -149,7 +149,7 @@ public class NannyFragment extends Fragment implements CardAdapter.OnItemClickLi
                         Review review = queryDocumentSnapshot.toObject(Review.class);
                         sum += review.getRating();
                     }
-                    String ratingAverageStr = String.valueOf(sum / querySnapshot.size());
+                    String ratingAverageStr = Float.compare(sum, 0.0f) == 0 ? "No reviews" : String.valueOf(sum / querySnapshot.size());
                     parentList.add(toCardModel(parent, profilePicture, userId, ratingAverageStr));
                     cardAdapter.notifyItemInserted(parentList.size());
                 } else {
