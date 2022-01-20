@@ -1,6 +1,12 @@
 package com.example.nannyapp.main.ui.profile;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
+
 import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,18 +22,36 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.nannyapp.R;
 import com.example.nannyapp.databinding.FragmentNannyProfileBinding;
 import com.example.nannyapp.entity.Nanny;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -38,6 +62,7 @@ import java.util.Map;
  */
 public class NannyProfileFragment extends Fragment {
     private static final String TAG = NannyProfileFragment.class.getSimpleName();
+    private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
 
     private FragmentNannyProfileBinding binding;
 
@@ -52,6 +77,8 @@ public class NannyProfileFragment extends Fragment {
     private EditText dateOfBirth;
     private EditText skills;
     private EditText experience;
+
+    private LatLng addressLocation;
 
     private Button save;
 
@@ -89,6 +116,9 @@ public class NannyProfileFragment extends Fragment {
 
         initForm();
         initSaveListener();
+
+        initPlaces();
+        initAutoComplete();
     }
 
     private void initForm() {
@@ -193,6 +223,8 @@ public class NannyProfileFragment extends Fragment {
                     updates.put("dateOfBirth", dateOfBirth.getText().toString());
                     updates.put("skills", skills.getText().toString());
                     updates.put("experience", experience.getText().toString());
+                    updates.put("addressLat", addressLocation.latitude);
+                    updates.put("addressLng", addressLocation.longitude);
 
                     firebaseFirestore.collection("Users")
                             .document(currentUser.getUid())
@@ -210,6 +242,77 @@ public class NannyProfileFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void initPlaces() {
+        ApplicationInfo applicationInfo = null;
+        String apiKey = null;
+        try {
+            applicationInfo = getContext().getPackageManager().getApplicationInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (applicationInfo != null ){
+            apiKey = applicationInfo.metaData.getString("com.google.android.geo.API_KEY");
+        }
+
+        // Initialize the SDK
+        Places.initialize(getContext(), apiKey);
+
+        // Create a new PlacesClient instance
+        PlacesClient placesClient = Places.createClient(getContext());
+
+        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+
+        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                .setTypeFilter(TypeFilter.ADDRESS)
+                .setSessionToken(token)
+                .setCountries("RO")
+                .build();
+
+        placesClient.findAutocompletePredictions(request).addOnSuccessListener(response -> {
+            for (AutocompletePrediction prediction: response.getAutocompletePredictions()) {
+                Log.d(TAG, "initPlaces: " + prediction.getPlaceId());
+                Log.d(TAG, "initPlaces: " + prediction.getPrimaryText(null).toString());
+            }
+        }).addOnFailureListener(exception -> {
+            if (exception instanceof ApiException) {
+                ApiException apiException = (ApiException) exception;
+                Log.e(TAG, "initPlaces: ", apiException.getCause());
+            }
+        });
+    }
+
+    private void initAutoComplete() {
+        binding.nannyProfileAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG);
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
+                        .build(getContext());
+                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Place place = Autocomplete.getPlaceFromIntent(data);
+                Log.i(TAG, "Place: " + place.getAddress() + ", " + place.getLatLng());
+                binding.nannyProfileAddress.setText(place.getAddress());
+                this.addressLocation = place.getLatLng();
+            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+                Status status = Autocomplete.getStatusFromIntent(data);
+                Log.i(TAG, status.getStatusMessage());
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private boolean validateFormFields() {

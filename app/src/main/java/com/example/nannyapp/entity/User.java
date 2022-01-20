@@ -6,18 +6,27 @@ public class User {
     private String lastName;
     private String phoneNumber;
     private String address;
+    private double addressLat;
+    private double addressLng;
     private String email;
 
 
     public User() {}
 
-    public User(Role role, String firstName, String lastName, String phoneNumber, String address, String email) {
-        this.role = role;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
-        this.email = email;
+    public double getAddressLat() {
+        return addressLat;
+    }
+
+    public void setAddressLat(double addressLat) {
+        this.addressLat = addressLat;
+    }
+
+    public double getAddressLng() {
+        return addressLng;
+    }
+
+    public void setAddressLng(double addressLng) {
+        this.addressLng = addressLng;
     }
 
     public Role getRole() {
