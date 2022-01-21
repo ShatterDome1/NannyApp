@@ -7,21 +7,31 @@
     android:layout_height="match_parent"
     tools:context=".login.ui.login.LoginFragment">
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/login_logo"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="64dp"
+        android:src="@drawable/logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <EditText
         android:id="@+id/login_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
         android:autofillHints="emailAddress"
         android:background="@drawable/edit_text_border"
         android:ems="15"
         android:hint="@string/email"
         android:inputType="textEmailAddress"
         android:padding="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/login_logo" />
 
     <EditText
         android:id="@+id/login_password"
