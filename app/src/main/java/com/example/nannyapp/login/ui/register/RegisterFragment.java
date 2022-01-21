@@ -83,24 +83,21 @@ public class RegisterFragment extends Fragment {
     }
 
     private void createAccount() {
-        firebaseAuth.createUserWithEmailAndPassword(email.getText().toString(),
-                password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "Account created successfully");
-                    FirebaseUser user = firebaseAuth.getCurrentUser();
+        firebaseAuth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Account created successfully");
+                        FirebaseUser user = firebaseAuth.getCurrentUser();
 
-                    sendVerificationEmail(user);
-                    createUserDocument(user.getUid());
+                        sendVerificationEmail(user);
+                        createUserDocument(user.getUid());
 
-                    Log.d(TAG, user.toString());
-                } else {
-                    Log.d(TAG, "Account creation failed", task.getException());
-                    Toast.makeText(getContext(), "Authentication failed", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+                        Log.d(TAG, user.toString());
+                    } else {
+                        Log.d(TAG, "Account creation failed", task.getException());
+                        Toast.makeText(getContext(), "Authentication failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void createUserDocument(String uid) {
@@ -113,14 +110,14 @@ public class RegisterFragment extends Fragment {
         user.setLastName(lastName.getText().toString());
         user.setEmail(email.getText().toString());
 
-        firebaseFirestore.collection("Users").document(uid).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "onComplete: firestore user added");
-                } else {
-                    Log.d(TAG, "onComplete: firestore user addition failed", task.getException());
-                }
+        firebaseFirestore.collection("Users")
+                .document(uid)
+                .set(user)
+                .addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Log.d(TAG, "onComplete: firestore user added");
+            } else {
+                Log.d(TAG, "onComplete: firestore user addition failed", task.getException());
             }
         });
     }
@@ -165,19 +162,16 @@ public class RegisterFragment extends Fragment {
     }
 
     private void sendVerificationEmail(FirebaseUser currentUser) {
-        currentUser.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(getContext(), "Verification email sent", Toast.LENGTH_SHORT).show();
-                    firebaseAuth.signOut();
+        currentUser.sendEmailVerification().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(getContext(), "Verification email sent", Toast.LENGTH_SHORT).show();
+                firebaseAuth.signOut();
 
-                    NavDirections action = RegisterFragmentDirections.actionRegisterFragmentToLoginFragment();
-                    Navigation.findNavController(getView()).navigate(action);
-                } else {
-                    Toast.makeText(getContext(), "Email verification failed", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "Email verification failed", task.getException());
-                }
+                NavDirections action = RegisterFragmentDirections.actionRegisterFragmentToLoginFragment();
+                Navigation.findNavController(getView()).navigate(action);
+            } else {
+                Toast.makeText(getContext(), "Email verification failed", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Email verification failed", task.getException());
             }
         });
     }

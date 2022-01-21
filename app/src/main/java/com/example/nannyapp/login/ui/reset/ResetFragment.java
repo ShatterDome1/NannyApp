@@ -75,18 +75,15 @@ public class ResetFragment extends Fragment {
     }
 
     private void sendPasswordResetEmail() {
-        firebaseAuth.sendPasswordResetEmail(email.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(getContext(), "Password reset email sent", Toast.LENGTH_SHORT).show();
+        firebaseAuth.sendPasswordResetEmail(email.getText().toString()).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(getContext(), "Password reset email sent", Toast.LENGTH_SHORT).show();
 
-                    NavDirections action = ResetFragmentDirections.actionResetFragmentToLoginFragment();
-                    Navigation.findNavController(getView()).navigate(action);
-                } else {
-                    Toast.makeText(getContext(), "Password reset failed. Please try again", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "onComplete: ", task.getException());
-                }
+                NavDirections action = ResetFragmentDirections.actionResetFragmentToLoginFragment();
+                Navigation.findNavController(getView()).navigate(action);
+            } else {
+                Toast.makeText(getContext(), "Password reset failed. Please try again", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onComplete: ", task.getException());
             }
         });
     }

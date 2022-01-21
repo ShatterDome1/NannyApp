@@ -7,13 +7,6 @@ public class Nanny extends User {
 
     public Nanny() {}
 
-    public Nanny(Role role, String firstName, String lastName, String phoneNumber, String address, String email, String dateOfBirth, String skills, String experience) {
-        super(role, firstName, lastName, phoneNumber, address, email);
-        this.dateOfBirth = dateOfBirth;
-        this.skills = skills;
-        this.experience = experience;
-    }
-
     public String getDateOfBirth() {
         return dateOfBirth;
     }

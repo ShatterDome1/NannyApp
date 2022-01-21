@@ -100,32 +100,26 @@ public class ParentDetailsFragment extends Fragment {
         firebaseFirestore.collection("Users")
                 .document(userId)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                   DocumentSnapshot documentSnapshot = task.getResult();
-                   parent = documentSnapshot.toObject(Parent.class);
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                       DocumentSnapshot documentSnapshot = task.getResult();
+                       parent = documentSnapshot.toObject(Parent.class);
 
-                    StorageReference profileImageStorageReference = storageReference.child("images/" + userId);
-                    final long ONE_MB = 1024 * 1024;
-                    profileImageStorageReference
-                            .getBytes(ONE_MB)
-                            .addOnCompleteListener(new OnCompleteListener<byte[]>() {
-                                @Override
-                                public void onComplete(@NonNull Task<byte[]> task) {
-                                    if (task.isSuccessful()) {
-                                        byte[] profilePicture = task.getResult();
+                        StorageReference profileImageStorageReference = storageReference.child("images/" + userId);
+                        final long ONE_MB = 1024 * 1024;
+                        profileImageStorageReference
+                                .getBytes(ONE_MB)
+                                .addOnCompleteListener(storageTask -> {
+                                    if (storageTask.isSuccessful()) {
+                                        byte[] profilePicture = storageTask.getResult();
 
                                         initTextViews(parent, profilePicture);
                                     } else {
-                                        Log.d(TAG, "onComplete: Failed to get profile image", task.getException());
+                                        Log.d(TAG, "onComplete: Failed to get profile image", storageTask.getException());
                                     }
-                                }
-                            });
-                }
-            }
-        });
+                                });
+                    }
+                });
     }
 
     private void initTextViews(Parent parent, byte[] profilePicture) {
@@ -146,17 +140,14 @@ public class ParentDetailsFragment extends Fragment {
                 firebaseFirestore.collection("Users")
                         .document(reviewerId)
                         .get()
-                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    DocumentSnapshot documentSnapshot = task.getResult();
-                                    Nanny nanny = documentSnapshot.toObject(Nanny.class);
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot documentSnapshot = task.getResult();
+                                Nanny nanny = documentSnapshot.toObject(Nanny.class);
 
-                                    showReviewDialog(nanny);
-                                } else {
-                                    Log.d(TAG, "onComplete: failed to retrieve current user information");
-                                }
+                                showReviewDialog(nanny);
+                            } else {
+                                Log.d(TAG, "onComplete: failed to retrieve current user information");
                             }
                         });
             }
@@ -174,25 +165,22 @@ public class ParentDetailsFragment extends Fragment {
         Query reviewQuery = firebaseFirestore.collection("Reviews")
                 .whereEqualTo("userId", userId);
 
-        reviewQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "onComplete: retrieved reviews = " + task.getResult().size());
-                    QuerySnapshot reviewDocuments = task.getResult();
-                    if (reviewDocuments.size() != 0) {
-                        for (QueryDocumentSnapshot reviewDocument : reviewDocuments) {
-                            Review review = reviewDocument.toObject(Review.class);
-                            String reviewerId = reviewDocument.getId().split(" ")[1];
+        reviewQuery.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Log.d(TAG, "onComplete: retrieved reviews = " + task.getResult().size());
+                QuerySnapshot reviewDocuments = task.getResult();
+                if (reviewDocuments.size() != 0) {
+                    for (QueryDocumentSnapshot reviewDocument : reviewDocuments) {
+                        Review review = reviewDocument.toObject(Review.class);
+                        String reviewerId = reviewDocument.getId().split(" ")[1];
 
-                            getReviewerDetailsAndAddToRecyclerList(review, reviewerId);
-                        }
-                    } else {
-                        binding.parentDetailsRating.setText("N/A");
+                        getReviewerDetailsAndAddToRecyclerList(review, reviewerId);
                     }
                 } else {
-                    Log.d(TAG, "onComplete: failed to retrieve reviews", task.getException());
+                    binding.parentDetailsRating.setText("N/A");
                 }
+            } else {
+                Log.d(TAG, "onComplete: failed to retrieve reviews", task.getException());
             }
         });
     }
@@ -201,21 +189,18 @@ public class ParentDetailsFragment extends Fragment {
         firebaseFirestore.collection("Users")
                 .document(reviewerId)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot userDocument = task.getResult();
-                            User user = userDocument.toObject(User.class);
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot userDocument = task.getResult();
+                        User user = userDocument.toObject(User.class);
 
-                            ReviewModel reviewModel = toReviewModel(review, user);
-                            reviewList.add(reviewModel);
-                            reviewAdapter.notifyItemInserted(reviewList.size());
+                        ReviewModel reviewModel = toReviewModel(review, user);
+                        reviewList.add(reviewModel);
+                        reviewAdapter.notifyItemInserted(reviewList.size());
 
-                            calculateAndSetReviewAverage();
-                        } else {
-                            Log.d(TAG, "onComplete: failed to retrieve reviewer details", task.getException());
-                        }
+                        calculateAndSetReviewAverage();
+                    } else {
+                        Log.d(TAG, "onComplete: failed to retrieve reviewer details", task.getException());
                     }
                 });
     }

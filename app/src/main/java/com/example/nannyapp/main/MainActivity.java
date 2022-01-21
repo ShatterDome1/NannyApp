@@ -118,20 +118,20 @@ public class MainActivity extends AppCompatActivity implements ReviewDialog.Revi
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         emailText.setText(currentUser.getEmail());
 
-        firebaseFirestore.collection("Users").document(currentUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    if (documentSnapshot != null) {
-                        User currentUser = task.getResult().toObject(User.class);
-                        nameText.setText(currentUser.getFirstName() + " " + currentUser.getLastName());
+        firebaseFirestore.collection("Users")
+                .document(currentUser.getUid())
+                .get()
+                .addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot documentSnapshot = task.getResult();
+                if (documentSnapshot != null) {
+                    User currentUser1 = task.getResult().toObject(User.class);
+                    nameText.setText(currentUser1.getFirstName() + " " + currentUser1.getLastName());
 
-                        initDrawerOptionsBasedOnRole(currentUser);
-                    }
-                } else {
-                    Log.d(TAG, "onComplete: Failed to get user", task.getException());
+                    initDrawerOptionsBasedOnRole(currentUser1);
                 }
+            } else {
+                Log.d(TAG, "onComplete: Failed to get user", task.getException());
             }
         });
 
@@ -139,17 +139,14 @@ public class MainActivity extends AppCompatActivity implements ReviewDialog.Revi
         final long ONE_MB = 1024 * 1024;
         profileImageStorageReference
                 .getBytes(ONE_MB)
-                .addOnCompleteListener(new OnCompleteListener<byte[]>() {
-                    @Override
-                    public void onComplete(@NonNull Task<byte[]> task) {
-                        if (task.isSuccessful()) {
-                            byte[] documentSnapshot = task.getResult();
-                            Bitmap profileImage = BitmapFactory.decodeByteArray(documentSnapshot, 0, documentSnapshot.length);
-                            profileImageView.setImageBitmap(profileImage);
-                        } else {
-                            Log.d(TAG, "onComplete: Failed to get profile image", task.getException());
-                            profileImageView.setImageResource(R.mipmap.ic_launcher_round);
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        byte[] documentSnapshot = task.getResult();
+                        Bitmap profileImage = BitmapFactory.decodeByteArray(documentSnapshot, 0, documentSnapshot.length);
+                        profileImageView.setImageBitmap(profileImage);
+                    } else {
+                        Log.d(TAG, "onComplete: Failed to get profile image", task.getException());
+                        profileImageView.setImageResource(R.mipmap.ic_launcher_round);
                     }
                 });
     }
@@ -193,18 +190,12 @@ public class MainActivity extends AppCompatActivity implements ReviewDialog.Revi
                 StorageReference uploadImageRef = storageReference.child("images/" + firebaseAuth.getCurrentUser().getUid());
                 UploadTask uploadTask = uploadImageRef.putFile(resultUri);
 
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getApplicationContext(), "Image upload failed. Please try again", Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Toast.makeText(getApplicationContext(), "Image upload successful", Toast.LENGTH_SHORT).show();
-                        profileImageView.setImageURI(resultUri);
-                    }
-                });
+                uploadTask.addOnFailureListener(
+                                e -> Toast.makeText(getApplicationContext(), "Image upload failed. Please try again", Toast.LENGTH_SHORT).show())
+                        .addOnSuccessListener(taskSnapshot -> {
+                            Toast.makeText(getApplicationContext(), "Image upload successful", Toast.LENGTH_SHORT).show();
+                            profileImageView.setImageURI(resultUri);
+                        });
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
                 Log.d(TAG, "onActivityResult: failed", error);
@@ -242,14 +233,11 @@ public class MainActivity extends AppCompatActivity implements ReviewDialog.Revi
         firebaseFirestore.collection("Reviews")
                 .document(userId + " " + reviewerId)
                 .set(review)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(), "Review posted", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Log.d(TAG, "onComplete: failed to push review", task.getException());
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getApplicationContext(), "Review posted", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d(TAG, "onComplete: failed to push review", task.getException());
                     }
                 });
     }

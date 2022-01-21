@@ -1,7 +1,13 @@
 package com.example.nannyapp.main.ui.profile;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
+
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,18 +24,35 @@ import android.widget.Toast;
 
 import com.example.nannyapp.databinding.FragmentParentProfileBinding;
 import com.example.nannyapp.entity.Parent;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ParentProfileFragment extends Fragment {
     private static final String TAG = ParentProfileFragment.class.getSimpleName();
+    private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
+
     private FragmentParentProfileBinding binding;
 
     private FirebaseFirestore firebaseFirestore;
@@ -44,9 +67,7 @@ public class ParentProfileFragment extends Fragment {
     private EditText description;
     private Button save;
 
-    public static ParentProfileFragment newInstance() {
-        return new ParentProfileFragment();
-    }
+    private LatLng addressLocation;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -75,6 +96,9 @@ public class ParentProfileFragment extends Fragment {
 
         initForm();
         initSaveListener();
+
+        initPlaces();
+        initAutoComplete();
     }
 
     private void initForm() {
@@ -83,18 +107,15 @@ public class ParentProfileFragment extends Fragment {
         firebaseFirestore.collection("Users")
                 .document(currentUser.getUid())
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    Parent currentUserAdditionalInfo;
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    currentUserAdditionalInfo = documentSnapshot.toObject(Parent.class);
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Parent currentUserAdditionalInfo;
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        currentUserAdditionalInfo = documentSnapshot.toObject(Parent.class);
 
-                    initAdditionalFields(currentUser, currentUserAdditionalInfo);
-                }
-            }
-        });
+                        initAdditionalFields(currentUser, currentUserAdditionalInfo);
+                    }
+                });
 
     }
 
@@ -147,23 +168,93 @@ public class ParentProfileFragment extends Fragment {
                     updates.put("noChildren", noChildren.getText().toString());
                     updates.put("address", address.getText().toString());
                     updates.put("description", description.getText().toString());
+                    updates.put("addressLat", addressLocation.latitude);
+                    updates.put("addressLng", addressLocation.longitude);
 
                     firebaseFirestore.collection("Users")
                             .document(currentUser.getUid())
                             .update(updates)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Toast.makeText(getContext(), "Profile details updated", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        Log.d(TAG, "onComplete: failed to update profile", task.getException());
-                                    }
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(getContext(), "Profile details updated", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Log.d(TAG, "onComplete: failed to update profile", task.getException());
                                 }
                             });
                 }
             }
         });
+    }
+
+    private void initPlaces() {
+        ApplicationInfo applicationInfo = null;
+        String apiKey = null;
+        try {
+            applicationInfo = getContext().getPackageManager().getApplicationInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (applicationInfo != null ){
+            apiKey = applicationInfo.metaData.getString("com.google.android.geo.API_KEY");
+        }
+
+        // Initialize the SDK
+        Places.initialize(getContext(), apiKey);
+
+        // Create a new PlacesClient instance
+        PlacesClient placesClient = Places.createClient(getContext());
+
+        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+
+        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                .setTypeFilter(TypeFilter.ADDRESS)
+                .setSessionToken(token)
+                .setCountries("RO")
+                .build();
+
+        placesClient.findAutocompletePredictions(request).addOnSuccessListener(response -> {
+            for (AutocompletePrediction prediction: response.getAutocompletePredictions()) {
+                Log.d(TAG, "initPlaces: " + prediction.getPlaceId());
+                Log.d(TAG, "initPlaces: " + prediction.getPrimaryText(null).toString());
+            }
+        }).addOnFailureListener(exception -> {
+            if (exception instanceof ApiException) {
+                ApiException apiException = (ApiException) exception;
+                Log.e(TAG, "initPlaces: ", apiException.getCause());
+            }
+        });
+    }
+
+    private void initAutoComplete() {
+        binding.profileAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG);
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
+                        .build(getContext());
+                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Place place = Autocomplete.getPlaceFromIntent(data);
+                Log.i(TAG, "Place: " + place.getAddress() + ", " + place.getLatLng());
+                binding.profileAddress.setText(place.getAddress());
+                this.addressLocation = place.getLatLng();
+            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+                Status status = Autocomplete.getStatusFromIntent(data);
+                Log.i(TAG, status.getStatusMessage());
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private boolean validateFormFields() {

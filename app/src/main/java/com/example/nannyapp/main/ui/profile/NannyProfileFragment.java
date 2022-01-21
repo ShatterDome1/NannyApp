@@ -123,17 +123,17 @@ public class NannyProfileFragment extends Fragment {
 
     private void initForm() {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        firebaseFirestore.collection("Users").document(firebaseUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    Nanny currentUserAdditionalInfo = documentSnapshot.toObject(Nanny.class);
+        firebaseFirestore.collection("Users")
+                .document(firebaseUser.getUid())
+                .get()
+                .addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot documentSnapshot = task.getResult();
+                Nanny currentUserAdditionalInfo = documentSnapshot.toObject(Nanny.class);
 
-                    initAdditionalFields(firebaseUser, currentUserAdditionalInfo);
-                } else {
-                    Log.d(TAG, "onComplete: failed to retrieve user", task.getException());
-                }
+                initAdditionalFields(firebaseUser, currentUserAdditionalInfo);
+            } else {
+                Log.d(TAG, "onComplete: failed to retrieve user", task.getException());
             }
         });
         initDateOfBirthPicker();
@@ -229,14 +229,11 @@ public class NannyProfileFragment extends Fragment {
                     firebaseFirestore.collection("Users")
                             .document(currentUser.getUid())
                             .update(updates)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Toast.makeText(getContext(), "Profile details updated", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        Log.d(TAG, "onComplete: failed to update profile", task.getException());
-                                    }
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(getContext(), "Profile details updated", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Log.d(TAG, "onComplete: failed to update profile", task.getException());
                                 }
                             });
                 }

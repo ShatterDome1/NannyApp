@@ -83,35 +83,29 @@ public class NannyFragment extends Fragment implements CardAdapter.OnItemClickLi
                 .collection("Users")
                 .whereEqualTo("role", Role.PARENT)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()) {
-                        Parent parent = queryDocumentSnapshot.toObject(Parent.class);
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()) {
+                            Parent parent = queryDocumentSnapshot.toObject(Parent.class);
 
-                        String userId = queryDocumentSnapshot.getId();
-                        StorageReference profileImageStorageReference = storageReference.child("images/" + userId);
-                        final long ONE_MB = 1024 * 1024;
-                        profileImageStorageReference
-                                .getBytes(ONE_MB)
-                                .addOnCompleteListener(new OnCompleteListener<byte[]>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<byte[]> task) {
-                                        if (task.isSuccessful()) {
-                                            byte[] profilePicture = task.getResult();
+                            String userId = queryDocumentSnapshot.getId();
+                            StorageReference profileImageStorageReference = storageReference.child("images/" + userId);
+                            final long ONE_MB = 1024 * 1024;
+                            profileImageStorageReference
+                                    .getBytes(ONE_MB)
+                                    .addOnCompleteListener(storageTask -> {
+                                        if (storageTask.isSuccessful()) {
+                                            byte[] profilePicture = storageTask.getResult();
                                             getReviewsAverageAndUpdateRecyclerView(parent, profilePicture, userId);
                                         } else {
-                                            Log.d(TAG, "onComplete: Failed to get profile image", task.getException());
+                                            Log.d(TAG, "onComplete: Failed to get profile image", storageTask.getException());
                                         }
-                                    }
-                                });
+                                    });
+                        }
+                    } else {
+                        Log.d(TAG, "onComplete: failed to retrieve parents", task.getException());
                     }
-                } else {
-                    Log.d(TAG, "onComplete: failed to retrieve parents", task.getException());
-                }
-            }
-        });
+                });
     }
 
     private CardModel toCardModel(Parent parent, byte[] profilePicture, String userId, String ratingAverage) {
@@ -139,22 +133,19 @@ public class NannyFragment extends Fragment implements CardAdapter.OnItemClickLi
         Query query = firebaseFirestore.collection("Reviews")
                 .whereEqualTo("userId", userId);
 
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    QuerySnapshot querySnapshot = task.getResult();
-                    Float sum = 0.0f;
-                    for (QueryDocumentSnapshot queryDocumentSnapshot: querySnapshot) {
-                        Review review = queryDocumentSnapshot.toObject(Review.class);
-                        sum += review.getRating();
-                    }
-                    String ratingAverageStr = Float.compare(sum, 0.0f) == 0 ? "No reviews" : String.valueOf(sum / querySnapshot.size());
-                    parentList.add(toCardModel(parent, profilePicture, userId, ratingAverageStr));
-                    cardAdapter.notifyItemInserted(parentList.size());
-                } else {
-                    Log.d(TAG, "onComplete: Failed to retrieve reviews for userId = " + userId);
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                Float sum = 0.0f;
+                for (QueryDocumentSnapshot queryDocumentSnapshot: querySnapshot) {
+                    Review review = queryDocumentSnapshot.toObject(Review.class);
+                    sum += review.getRating();
                 }
+                String ratingAverageStr = Float.compare(sum, 0.0f) == 0 ? "No reviews" : String.valueOf(sum / querySnapshot.size());
+                parentList.add(toCardModel(parent, profilePicture, userId, ratingAverageStr));
+                cardAdapter.notifyItemInserted(parentList.size());
+            } else {
+                Log.d(TAG, "onComplete: Failed to retrieve reviews for userId = " + userId);
             }
         });
     }

@@ -74,23 +74,20 @@ public class LoginFragment extends Fragment {
                 if (validateLoginFields()) {
                     firebaseAuth.signInWithEmailAndPassword(
                             binding.loginEmail.getText().toString(),
-                            binding.loginPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-                                if (checkUserEmailVerification(currentUser)) {
-                                    Intent intent = new Intent(getActivity(), MainActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    startActivity(intent);
+                            binding.loginPassword.getText().toString()).addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+                                    if (checkUserEmailVerification(currentUser)) {
+                                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intent);
+                                    }
+                                    Log.d(TAG, "Sign in with email successful");
+                                } else {
+                                    Toast.makeText(getContext(), "Invalid email or password", Toast.LENGTH_SHORT).show();
+                                    Log.w(TAG, "Sign in with email failed");
                                 }
-                                Log.d(TAG, "Sign in with email successful");
-                            } else {
-                                Toast.makeText(getContext(), "Invalid email or password", Toast.LENGTH_SHORT).show();
-                                Log.w(TAG, "Sign in with email failed");
-                            }
-                        }
-                    });
+                            });
                 }
             }
         });
