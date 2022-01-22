@@ -17,6 +17,7 @@ import androidx.navigation.Navigation;
 import com.example.nannyapp.R;
 import com.example.nannyapp.entity.Role;
 import com.example.nannyapp.entity.User;
+import com.example.nannyapp.main.MainActivity;
 import com.example.nannyapp.main.ui.users.NannyFragmentDirections;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -61,6 +62,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Google
         currentUserId = firebaseAuth.getCurrentUser().getUid();
 
         return v;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        ((MainActivity) getActivity()).verifyUserInformationHasBeenAdded(Navigation.findNavController(getView()));
     }
 
     @Override
@@ -146,4 +153,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Google
             Navigation.findNavController(getView()).navigate(navDirections);
         }
     }
+
+
 }

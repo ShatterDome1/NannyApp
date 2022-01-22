@@ -5,23 +5,31 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.example.nannyapp.R;
 import com.example.nannyapp.databinding.FragmentParentBinding;
 import com.example.nannyapp.entity.Nanny;
+import com.example.nannyapp.entity.Parent;
 import com.example.nannyapp.entity.Review;
 import com.example.nannyapp.entity.Role;
+import com.example.nannyapp.entity.User;
+import com.example.nannyapp.main.MainActivity;
 import com.example.nannyapp.main.adapter.user.CardAdapter;
 import com.example.nannyapp.main.adapter.user.CardModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -36,10 +44,10 @@ public class ParentFragment extends Fragment implements CardAdapter.OnItemClickL
 
     private FragmentParentBinding binding;
 
-
     private FirebaseFirestore firebaseFirestore;
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
+    private FirebaseAuth firebaseAuth;
 
     private ArrayList<CardModel> nannyList;
     private CardAdapter cardAdapter;
@@ -53,6 +61,9 @@ public class ParentFragment extends Fragment implements CardAdapter.OnItemClickL
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        ((MainActivity) getActivity()).verifyUserInformationHasBeenAdded(Navigation.findNavController(getView()));
 
         nannyList = new ArrayList<>();
         initNannyList();

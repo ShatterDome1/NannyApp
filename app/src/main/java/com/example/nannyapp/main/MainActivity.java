@@ -14,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.nannyapp.R;
+import com.example.nannyapp.entity.Nanny;
+import com.example.nannyapp.entity.Parent;
 import com.example.nannyapp.entity.Review;
 import com.example.nannyapp.entity.User;
 import com.example.nannyapp.login.LoginActivity;
@@ -28,9 +30,11 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -115,27 +119,27 @@ public class MainActivity extends AppCompatActivity implements ReviewDialog.Revi
 
         initProfilePicturePicker(profileImageView);
 
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-        emailText.setText(currentUser.getEmail());
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        emailText.setText(firebaseUser.getEmail());
 
         firebaseFirestore.collection("Users")
-                .document(currentUser.getUid())
+                .document(firebaseUser.getUid())
                 .get()
                 .addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot documentSnapshot = task.getResult();
                 if (documentSnapshot != null) {
-                    User currentUser1 = task.getResult().toObject(User.class);
-                    nameText.setText(currentUser1.getFirstName() + " " + currentUser1.getLastName());
+                    User currentUser = task.getResult().toObject(User.class);
+                    nameText.setText(currentUser.getFirstName() + " " + currentUser.getLastName());
 
-                    initDrawerOptionsBasedOnRole(currentUser1);
+                    initDrawerOptionsBasedOnRole(currentUser);
                 }
             } else {
                 Log.d(TAG, "onComplete: Failed to get user", task.getException());
             }
         });
 
-        StorageReference profileImageStorageReference = storageReference.child("images/" + currentUser.getUid());
+        StorageReference profileImageStorageReference = storageReference.child("images/" + firebaseUser.getUid());
         final long ONE_MB = 1024 * 1024;
         profileImageStorageReference
                 .getBytes(ONE_MB)
@@ -238,6 +242,47 @@ public class MainActivity extends AppCompatActivity implements ReviewDialog.Revi
                         Toast.makeText(getApplicationContext(), "Review posted", Toast.LENGTH_SHORT).show();
                     } else {
                         Log.d(TAG, "onComplete: failed to push review", task.getException());
+                    }
+                });
+    }
+
+    public void verifyUserInformationHasBeenAdded(NavController navController) {
+        firebaseFirestore.collection("Users")
+                .document(firebaseAuth.getCurrentUser().getUid())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        User user = documentSnapshot.toObject(User.class);
+
+                        boolean redirectToUserProfile = false;
+                        boolean isUserParent = documentSnapshot.get("role").equals(Role.PARENT.getRole());
+                        if (user.getAddress() == null  || user.getAddress().isEmpty() ||
+                                user.getPhoneNumber() == null || user.getPhoneNumber().isEmpty()) {
+                            redirectToUserProfile = true;
+                        }
+
+                        if (isUserParent) {
+                            Parent parent = documentSnapshot.toObject(Parent.class);
+                            if (parent.getNoChildren() == null || parent.getNoChildren().isEmpty() ||
+                                    parent.getDescription() == null || parent.getDescription().isEmpty()) {
+                                redirectToUserProfile = true;
+                            }
+                        } else {
+                            Nanny nanny = documentSnapshot.toObject(Nanny.class);
+                            if (nanny.getSkills() == null || nanny.getSkills().isEmpty()  ||
+                                    nanny.getDateOfBirth() == null || nanny.getDateOfBirth().isEmpty() ) {
+                                redirectToUserProfile = true;
+                            }
+                        }
+
+                        int fragmentId = isUserParent ? R.id.nav_parent_profile : R.id.nav_nanny_profile;
+                        if (redirectToUserProfile) {
+                            navController.navigate(fragmentId);
+                            Toast.makeText(getApplicationContext(), "Please fill in user details before using the application", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Log.d(TAG, "verifyUserInformationHasBeenAdded: failed to retrieve user information", task.getException());
                     }
                 });
     }
