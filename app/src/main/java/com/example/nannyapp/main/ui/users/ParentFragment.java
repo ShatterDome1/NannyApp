@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -63,8 +64,6 @@ public class ParentFragment extends Fragment implements CardAdapter.OnItemClickL
         storageReference = firebaseStorage.getReference();
         firebaseAuth = FirebaseAuth.getInstance();
 
-        ((MainActivity) getActivity()).verifyUserInformationHasBeenAdded(Navigation.findNavController(getView()));
-
         nannyList = new ArrayList<>();
         initNannyList();
 
@@ -80,6 +79,12 @@ public class ParentFragment extends Fragment implements CardAdapter.OnItemClickL
         nannyRecyclerView.setAdapter(cardAdapter);
 
         return root;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        ((MainActivity) getActivity()).verifyUserInformationHasBeenAdded(Navigation.findNavController(getView()));
     }
 
     private void initNannyList() {
