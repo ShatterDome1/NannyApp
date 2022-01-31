@@ -223,8 +223,10 @@ public class NannyProfileFragment extends Fragment {
                     updates.put("dateOfBirth", dateOfBirth.getText().toString());
                     updates.put("skills", skills.getText().toString());
                     updates.put("experience", experience.getText().toString());
-                    updates.put("addressLat", addressLocation.latitude);
-                    updates.put("addressLng", addressLocation.longitude);
+                    if (addressLocation != null) {
+                        updates.put("addressLat", addressLocation.latitude);
+                        updates.put("addressLng", addressLocation.longitude);
+                    }
 
                     firebaseFirestore.collection("Users")
                             .document(currentUser.getUid())

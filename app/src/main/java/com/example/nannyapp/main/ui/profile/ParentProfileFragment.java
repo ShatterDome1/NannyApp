@@ -168,8 +168,10 @@ public class ParentProfileFragment extends Fragment {
                     updates.put("noChildren", noChildren.getText().toString());
                     updates.put("address", address.getText().toString());
                     updates.put("description", description.getText().toString());
-                    updates.put("addressLat", addressLocation.latitude);
-                    updates.put("addressLng", addressLocation.longitude);
+                    if (addressLocation != null) {
+                        updates.put("addressLat", addressLocation.latitude);
+                        updates.put("addressLng", addressLocation.longitude);
+                    }
 
                     firebaseFirestore.collection("Users")
                             .document(currentUser.getUid())
